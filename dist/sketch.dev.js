@@ -44,6 +44,9 @@ function setup() {
   sliderR = createSlider(0, 255, 100);
   sliderR.position(10, 10);
   sliderR.style('width', '80px');
+  button = createButton('print');
+  button.position(0, 0);
+  button.mousePressed(printTest);
 }
 
 function draw() {
@@ -86,4 +89,14 @@ function onMessageArrived(message) {
   if (incomingNumber > 0) {
     intensity = 255;
   }*/
+}
+
+function printTest() {
+  if (connected) {
+    var message = new Paho.MQTT.Message(String(v)); // start an MQTT message:
+
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log("sending test to printer");
+  }
 }
