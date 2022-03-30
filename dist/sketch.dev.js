@@ -18,14 +18,16 @@ var creds = {
   clientID: 'p5Client',
   userName: 'public',
   password: 'public'
-};
+}; //Interface
+
+var input, button, greeting;
 var sliderR;
 var psliderR = 0;
 var connected = false;
 
 function setup() {
   // put setup code here
-  createCanvas(100, 100);
+  createCanvas(windowWidth, windowHeight);
   client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID); // set callback handlers for the client:
 
   client.onConnectionLost = onConnectionLost;
@@ -40,13 +42,15 @@ function setup() {
     // password
     useSSL: true // use SSL
 
-  });
-  sliderR = createSlider(0, 255, 100);
-  sliderR.position(10, 10);
-  sliderR.style('width', '80px');
-  button = createButton('print');
-  button.position(0, 0);
-  button.mousePressed(printTest);
+  }); //sliderR = createSlider(0, 255, 100);
+  //sliderR.position(10, 10);
+  //sliderR.style('width', '80px');
+
+  input = createInput();
+  input.position(width / 2 - input.width / 2, height / 2);
+  button = createButton('Imprimer !!');
+  button.position(input.x + input.width, height / 2);
+  button.mousePressed(printInput);
 }
 
 function draw() {
@@ -94,6 +98,16 @@ function onMessageArrived(message) {
 function printTest() {
   if (connected) {
     var message = new Paho.MQTT.Message("printTest"); // start an MQTT message:
+
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log("sending test to printer");
+  }
+}
+
+function printInput() {
+  if (connected) {
+    var message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
 
     message.destinationName = "/printer/test";
     client.send(message);

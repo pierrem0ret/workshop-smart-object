@@ -20,6 +20,9 @@ let creds = {
   password: 'public'
 }
 
+//Interface
+let input, button, greeting;
+
 
 let sliderR;
 let psliderR = 0
@@ -28,7 +31,7 @@ let connected = false;
 
 function setup() {
   // put setup code here
-  createCanvas(100, 100);
+  createCanvas(windowWidth, windowHeight);
 
   client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
   // set callback handlers for the client:
@@ -43,13 +46,16 @@ function setup() {
   });
 
 
-  sliderR = createSlider(0, 255, 100);
-  sliderR.position(10, 10);
-  sliderR.style('width', '80px');
+  //sliderR = createSlider(0, 255, 100);
+  //sliderR.position(10, 10);
+  //sliderR.style('width', '80px');
 
-  button = createButton('print');
-  button.position(0, 0);
-  button.mousePressed(printTest);
+  input = createInput();
+  input.position(width/2 -  input.width/2, height/2);
+
+  button = createButton('Imprimer !!');
+  button.position(input.x + input.width, height/2);
+  button.mousePressed(printInput);
 
 }
 
@@ -67,7 +73,6 @@ function draw() {
     }
   }
   psliderR = v;
-
 
 }
 
@@ -104,4 +109,14 @@ function printTest() {
       console.log("sending test to printer")
     }
   
+}
+
+function printInput() {
+  if (connected) {
+    let message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log("sending test to printer")
+  }
+
 }
