@@ -93,7 +93,7 @@ function onMessageArrived(message) {
 
 function printTest() {
   if (connected) {
-    var message = new Paho.MQTT.Message(String(v)); // start an MQTT message:
+    var message = new Paho.MQTT.Message("test"); // start an MQTT message:
 
     message.destinationName = "/printer/test";
     client.send(message);
