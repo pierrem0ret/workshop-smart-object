@@ -33,6 +33,7 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #include "Adafruit_Thermal.h"
 #include "date3.h"
 #include "sudoku2.h"
+#include "dessin.h"
 #include "SoftwareSerial.h"
 
 const int printerBaudrate = 19200;  // or 19200 usually
@@ -105,7 +106,8 @@ void setup() {
   client.subscribe("/printer/test");
   client.onMessage(doStuff);
 
-  printDate();
+  //printDate();
+  printDessin();
   //printTest();
   //printSudoku();
   //imprimerAvecCaracteresSpeciaux("ÇüéâäàçêëèïîÉôöûÿ");
@@ -146,7 +148,11 @@ void doStuff(String &topic, String &payload) {
     blue = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/printer/test")) {
     //imprimerAvecCaracteresSpeciaux(payload);
+    printer.println("----------------------------");
+    printer.feed(1);
     printer.println(payload);
+    printer.feed(1);
+    
   }
 }
 
@@ -218,6 +224,10 @@ void printTest() {
 void printSudoku() {
   printer.printBitmap(sudoku2_width, sudoku2_height, sudoku2_data);
 }
+
+void printDessin() {
+  printer.printBitmap(dessin_width, dessin_height, dessin_data);
+  }
 
 void imprimerAvecCaracteresSpeciaux(String test) {
   int i = 0;

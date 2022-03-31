@@ -20,14 +20,16 @@ var creds = {
   password: 'public'
 }; //Interface
 
-var input, button, greeting;
+var input, button, greeting; //Messages
+
+var messages = [];
 var sliderR;
 var psliderR = 0;
 var connected = false;
 
 function setup() {
   // put setup code here
-  createCanvas(windowWidth, windowHeight);
+  //createCanvas(300, 300);
   client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID); // set callback handlers for the client:
 
   client.onConnectionLost = onConnectionLost;
@@ -42,20 +44,21 @@ function setup() {
     // password
     useSSL: true // use SSL
 
-  }); //sliderR = createSlider(0, 255, 100);
+  });
+  input = document.getElementById("chant"); //sliderR = createSlider(0, 255, 100);
   //sliderR.position(10, 10);
   //sliderR.style('width', '80px');
 
+  /*
   input = createInput();
-  input.position(width / 2 - input.width / 2, height / 2);
-  button = createButton('Imprimer !!');
-  button.position(input.x + input.width, height / 2);
-  button.mousePressed(printInput);
-}
-
-function draw() {
-  // put drawing code here
-  background(180);
+  input.position(width/2 -  input.width/2, height/2);
+   button = createButton('Envoyer !!');
+  button.position(input.x + input.width, height/2);
+  button.mousePressed(stockInput);
+   buttonAdmin = createButton('Imprimer');
+  buttonAdmin.position(input.x + input.width, height/2 + 30);
+  buttonAdmin.mousePressed(sendMessages);
+  */
 } // called when the client connects
 
 
@@ -101,4 +104,34 @@ function printInput() {
     client.send(message);
     console.log("sending test to printer");
   }
+}
+
+function printMessages() {
+  if (connected) {
+    var message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
+
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log("sending test to printer");
+  }
+}
+
+function stockInput() {
+  console.log(input.value);
+  console.log("test");
+
+  if (connected) {
+    var newLength = messages.push(input.value);
+    input.value = "";
+  }
+}
+
+function sendMessages() {
+  messages.forEach(function (item, index, array) {
+    var message = new Paho.MQTT.Message(item, index); // start an MQTT message:
+
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log(index, item);
+  });
 }

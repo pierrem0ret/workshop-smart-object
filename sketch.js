@@ -23,15 +23,20 @@ let creds = {
 //Interface
 let input, button, greeting;
 
+//Messages
+let messages = [];
+
 
 let sliderR;
 let psliderR = 0
 
 let connected = false;
 
+
+
 function setup() {
   // put setup code here
-  createCanvas(windowWidth, windowHeight);
+  //createCanvas(300, 300);
 
   client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
   // set callback handlers for the client:
@@ -45,23 +50,24 @@ function setup() {
     useSSL: true // use SSL
   });
 
+  input = document.getElementById("chant");
 
   //sliderR = createSlider(0, 255, 100);
   //sliderR.position(10, 10);
   //sliderR.style('width', '80px');
 
+  /*
   input = createInput();
   input.position(width/2 -  input.width/2, height/2);
 
-  button = createButton('Imprimer !!');
+  button = createButton('Envoyer !!');
   button.position(input.x + input.width, height/2);
-  button.mousePressed(printInput);
+  button.mousePressed(stockInput);
 
-}
-
-function draw() {
-  // put drawing code here
-  background(180)
+  buttonAdmin = createButton('Imprimer');
+  buttonAdmin.position(input.x + input.width, height/2 + 30);
+  buttonAdmin.mousePressed(sendMessages);
+  */
 
 }
 
@@ -110,3 +116,35 @@ function printInput() {
   }
 
 }
+
+function printMessages() { 
+  if (connected) {
+    let message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log("sending test to printer")
+  }
+
+}
+
+
+function stockInput() { 
+  console.log(input.value);
+  console.log("test");
+  if (connected) {
+    let newLength = messages.push(input.value);
+    input.value = "";
+  }
+
+
+}
+
+function sendMessages() {
+  messages.forEach(function(item, index, array) {
+    let message = new Paho.MQTT.Message(item, index); // start an MQTT message:
+    message.destinationName = "/printer/test";
+    client.send(message);
+    console.log(index, item)
+  });
+}
+

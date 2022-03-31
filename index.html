@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>p5.js example</title>
+  <title>FaxBook</title>
   <style>
     body {
       padding: 0;
@@ -16,10 +16,26 @@
   <script src="libs/p5.js"></script>
   <!-- <script src="../addons/p5.sound.js"></script> -->
   <script src="sketch.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/dd795629d4.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <main>
+    <div class="header">
+      <h1>Ticket</h1>
+      <button onclick="stockInput()">Envoyer</button>
+    </div>
+    <div class="sendto">
+      <i class="fa-solid fa-user-group"></i>
+      <span>Gisèle, Françoise, Jean</span>
+    </div>
+    <div class="ticket">
+      <textarea id="chant" class="message" type="text"></textarea>
+    </div>
   </main>
 </body>
 
