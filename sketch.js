@@ -140,7 +140,8 @@ function stockInput() {
 }
 
 function sendMessages() {
-  messages.forEach(function(item, index, array) {
+  console.log("envoi")
+    messages.forEach(function(item, index, array) {
     let message = new Paho.MQTT.Message(item, index); // start an MQTT message:
     message.destinationName = "/printer/test";
     client.send(message);

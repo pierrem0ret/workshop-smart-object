@@ -127,6 +127,7 @@ function stockInput() {
 }
 
 function sendMessages() {
+  console.log("envoi");
   messages.forEach(function (item, index, array) {
     var message = new Paho.MQTT.Message(item, index); // start an MQTT message:
 
