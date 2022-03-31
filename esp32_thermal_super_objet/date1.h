@@ -1,10 +1,10 @@
-#ifndef _D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_h_
-#define _D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_h_
+#ifndef _date_h_
+#define _date_h_
 
-#define D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_width  93
-#define D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_height 93
+const uint8_t date_width = 93;
+const uint8_t date_height = 93;
 
-static const uint8_t PROGMEM D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_data[] = {
+static uint8_t PROGMEM date_data[] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -119,4 +119,4 @@ static const uint8_t PROGMEM D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-#endif // _D:\Utilisateurs\Pierre\Documents\Pierre\EDNA\UX3\S2 - Workshop Objet connecté\codes\test_image_to_printer\data\12_h_
+#endif // _date_h_

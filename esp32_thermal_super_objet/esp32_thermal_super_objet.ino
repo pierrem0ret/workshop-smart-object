@@ -1,6 +1,6 @@
 
 /*
- * 
+
    based on : https://www.shiftr.io/docs/manuals/arduino
    install arduino-mqtt (by Joël Gähwiler) : https://github.com/256dpi/arduino-mqtt
    install WiFiManager from https://github.com/tzapu/WiFiManager
@@ -30,16 +30,18 @@ char *espname = "esp8266_mqtt_cablesgl";
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 //Printer stuff
-#include "TPrinter.h"
-#include <HardwareSerial.h> // or SoftwareSerial
+#include <SoftwareSerial.h> // or SoftwareSerial
+#include "Adafruit_Thermal.h"
+#include "date3.h"
+#include "SoftwareSerial.h"
 
 const int printerBaudrate = 19200;  // or 19200 usually
-const byte rxPin = 16;   // check datasheet of your board
-const byte txPin = 13;   // check adatasheet of your board
-const byte dtrPin = 4;   // if used
+#define TX_PIN 13 // Arduino transmit  YELLOW WIRE  labeled RX on printer
+#define RX_PIN 5 // Arduino receive   GREEN WIRE   labeled TX on printer
 
-HardwareSerial mySerial(1);
-Tprinter myPrinter(&mySerial, printerBaudrate);
+SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
+Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
+
 
 // MQTT stuff
 #include <MQTT.h>
@@ -61,7 +63,6 @@ float blue = 0;
 
 //----------------------------------------------------------------------------------
 void setup() {
-
   Serial.begin(115200);
 
   // init the lights at startup
@@ -73,9 +74,8 @@ void setup() {
   pixels.show();
 
   //Printer
-  micros();
-  mySerial.begin(printerBaudrate, SERIAL_8N1, rxPin, txPin);  // must be 8N1 mode
-  myPrinter.begin();
+  mySerial.begin(printerBaudrate);  // must be 8N1 mode
+  printer.begin();        // Init printer (same regardless of serial type)
 
   // wifi stuff
   pinMode(LED, OUTPUT);
@@ -100,6 +100,12 @@ void setup() {
   client.subscribe("/lamp1/b");
   client.subscribe("/printer/test");
   client.onMessage(doStuff);
+
+  //printDate();
+  printTest();
+
+  printer.feed(4);
+  printer.setDefault(); // Restore printer to defaults
 
 }
 
@@ -126,14 +132,13 @@ void doStuff(String &topic, String &payload) {
   Serial.println(topic + " 1 : " + payload);
 
   if (topic.startsWith("/lamp1/r")) {
-  red = payload.toFloat() * 255.0;
+    red = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/lamp1/g")) {
-  green = payload.toFloat() * 255.0;
+    green = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/lamp1/b")) {
-  blue = payload.toFloat() * 255.0;
+    blue = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/printer/test")) {
-  //String testPrint = payload.toString();
-  myPrinter.println(payload);
+    printer.println(payload);
   }
 }
 
@@ -171,4 +176,33 @@ void configModeCallback (WiFiManager *myWiFiManager) {
   Serial.println(myWiFiManager->getConfigPortalSSID());
   //entered config mode, make led toggle faster
   ticker.attach(0.2, tick);
+}
+
+void printDate() {
+  printer.feed(5);
+  printer.justify('L');
+  printer.printBitmap(date3_width, date3_height, date3_data);
+  printer.feed(1);
+  printer.justify('L');
+  printer.setSize('L');
+  printer.println("Mars 2022");
+  printer.setSize('M');
+  printer.feed(1);
+  printer.println("Saint Justine");
+  printer.feed(1);
+  printer.justify('L');
+  printer.setSize('S');
+  printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
+  printer.feed(1);
+  printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
+  printer.feed(2);
+  printer.setSize('M');
+  printer.println("Vos messages");
+  printer.feed(1);
+  printer.feed(5);
+}
+
+void printTest() {
+  printer.println("C'est le test");
+
 }

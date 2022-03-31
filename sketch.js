@@ -63,17 +63,6 @@ function draw() {
   // put drawing code here
   background(180)
 
-  let v = sliderR.value();
-  if (psliderR != v) {
-    if (connected) {
-      let message = new Paho.MQTT.Message(String(v)); // start an MQTT message:
-      message.destinationName = "/lamp1/r";
-      client.send(message);
-      console.log("sending slider R value" + v)
-    }
-  }
-  psliderR = v;
-
 }
 
 
@@ -81,6 +70,7 @@ function draw() {
 function onConnect() {
   console.log("connected")
   client.subscribe("/lamp1/r");
+  client.subscribe("/printer/test");
   connected = true
 }
 
@@ -111,7 +101,7 @@ function printTest() {
   
 }
 
-function printInput() {
+function printInput() { 
   if (connected) {
     let message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
     message.destinationName = "/printer/test";
