@@ -21,7 +21,6 @@ char *espname = "esp8266_mqtt_cablesgl";
 #include <WiFiManager.h>
 #include <Ticker.h>
 
-
 // led stuff
 #include <Adafruit_NeoPixel.h>
 // neopixel variables
@@ -33,6 +32,7 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #include <SoftwareSerial.h> // or SoftwareSerial
 #include "Adafruit_Thermal.h"
 #include "date3.h"
+#include "sudoku2.h"
 #include "SoftwareSerial.h"
 
 const int printerBaudrate = 19200;  // or 19200 usually
@@ -61,6 +61,8 @@ float red = 0;
 float green = 0;
 float blue = 0;
 
+
+
 //----------------------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
@@ -76,6 +78,8 @@ void setup() {
   //Printer
   mySerial.begin(printerBaudrate);  // must be 8N1 mode
   printer.begin();        // Init printer (same regardless of serial type)
+  printer.setCharset(CHARSET_FRANCE);
+  printer.setCodePage(CODEPAGE_CP437);
 
   // wifi stuff
   pinMode(LED, OUTPUT);
@@ -101,8 +105,11 @@ void setup() {
   client.subscribe("/printer/test");
   client.onMessage(doStuff);
 
-  //printDate();
-  printTest();
+  printDate();
+  //printTest();
+  //printSudoku();
+  //imprimerAvecCaracteresSpeciaux("ÇüéâäàçêëèïîÉôöûÿ");
+
 
   printer.feed(4);
   printer.setDefault(); // Restore printer to defaults
@@ -129,7 +136,7 @@ void loop() {
 
 void doStuff(String &topic, String &payload) {
   Serial.println(topic + " 1 : " + payload);
-  Serial.println(topic + " 1 : " + payload);
+  //Serial.println(topic + " 1 : " + payload);
 
   if (topic.startsWith("/lamp1/r")) {
     red = payload.toFloat() * 255.0;
@@ -138,6 +145,7 @@ void doStuff(String &topic, String &payload) {
   } else if (topic.startsWith("/lamp1/b")) {
     blue = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/printer/test")) {
+    //imprimerAvecCaracteresSpeciaux(payload);
     printer.println(payload);
   }
 }
@@ -188,13 +196,13 @@ void printDate() {
   printer.println("Mars 2022");
   printer.setSize('M');
   printer.feed(1);
-  printer.println("Saint Justine");
+  printer.println("Sainte Justine");
   printer.feed(1);
   printer.justify('L');
   printer.setSize('S');
-  printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
+  imprimerAvecCaracteresSpeciaux("Au tout début de la chanson ''Roxane'' de The Police, si vous tendez l'oreille, STING éclate de rire parcequ'il s'est assis sur le piano");
   printer.feed(1);
-  printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
+  //printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
   printer.feed(2);
   printer.setSize('M');
   printer.println("Vos messages");
@@ -205,4 +213,56 @@ void printDate() {
 void printTest() {
   printer.println("C'est le test");
 
+}
+
+void printSudoku() {
+  printer.printBitmap(sudoku2_width, sudoku2_height, sudoku2_data);
+}
+
+void imprimerAvecCaracteresSpeciaux(String test) {
+  int i = 0;
+  boolean special = false;
+  byte printable;
+
+  while (i < test.length()) {
+
+    //printer.print(byte(test[i]));
+    //printer.print(" ");
+
+    if (byte(test[i]) == 0xC3) { // Caractère spécial détecté
+      special = true;
+      byte carac = test[i + 1];
+
+      // Serial.print(byte(test[i]), HEX);
+      // Serial.print(" ");
+      // Serial.println(carac, HEX);
+
+      i += 2;
+
+      switch (carac) {
+        case 0x87 :  printable = 0x80;  break;  // Ç
+        case 0xBC :  printable = 0x81;  break;  // ü
+        case 0xA9 :  printable = 0x82;  break;  // é
+        case 0xA2 :  printable = 0x83;  break;  // â
+        case 0xA4 :  printable = 0x84;  break;  // ä
+        case 0xA0 :  printable = 0x85;  break;  // à
+        case 0xA7 :  printable = 0x87;  break;  // ç
+        case 0xAA :  printable = 0x88;  break;  // ê
+        case 0xAB :  printable = 0x89;  break;  // ë
+        case 0xA8 :  printable = 0x8A;  break;  // è
+        case 0xAF :  printable = 0x8B;  break;  // ï
+        case 0xAE :  printable = 0x8C;  break;  // î
+        case 0x89 :  printable = 0x90;  break;  // É
+        case 0xB4 :  printable = 0x93;  break;  // ô
+        case 0xB6 :  printable = 0x94;  break;  // ö
+        case 0xBB :  printable = 0x96;  break;  // û
+        case 0xBF :  printable = 0x98;  break;  // ÿ
+        default :    printable = 0xFA;  break;
+      }
+    } else {                    // ASCII de base
+      printable = byte(test[i]);
+      i += 1;
+    }
+    printer.write(printable);
+  }
 }
