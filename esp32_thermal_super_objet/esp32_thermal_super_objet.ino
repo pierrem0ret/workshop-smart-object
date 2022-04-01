@@ -231,9 +231,9 @@ void printDate() {
   //printer.println("Au tout début de la chanson “Roxane” de The Police, si vous tendez l’oreille, STING éclate de rire parcequ’il s’est assis sur le piano");
   printer.feed(2);
   printer.setSize('M');
-  printer.println("Vos messages");
+  //printer.println("Vos messages");
   printer.feed(1);
-  printer.feed(5);
+  printer.feed(15);
 }
 
 void printTest() {
