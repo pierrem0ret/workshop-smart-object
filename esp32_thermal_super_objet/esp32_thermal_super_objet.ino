@@ -1,4 +1,3 @@
-
 /*
 
    based on : https://www.shiftr.io/docs/manuals/arduino
@@ -23,10 +22,24 @@ char *espname = "esp8266_mqtt_cablesgl";
 
 // led stuff
 #include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
 // neopixel variables
-#define PIN        14
-#define NUMPIXELS 16
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+#define PIN_EYE1            14
+#define PIN_EYE2            32
+#define PIN_MOUTH           15
+
+#define NUMPIXELS           7
+#define NUMPIXELS_BIG       12
+
+int tim = 2000;
+int tim_short = 500;
+
+Adafruit_NeoPixel ring1 = Adafruit_NeoPixel(NUMPIXELS, PIN_EYE1, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel ring2 = Adafruit_NeoPixel(NUMPIXELS, PIN_EYE2, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel mouth = Adafruit_NeoPixel(NUMPIXELS_BIG, PIN_MOUTH, NEO_RGB + NEO_KHZ800);
 
 //Printer stuff
 #include <SoftwareSerial.h> // or SoftwareSerial
@@ -69,12 +82,12 @@ void setup() {
   Serial.begin(115200);
 
   // init the lights at startup
-  pixels.begin();
-  pixels.setBrightness(20);
-  for (int i = 0; i < NUMPIXELS; i++) { // For each pixel...
-    pixels.setPixelColor(i, pixels.Color(red, green, blue));
-  }
-  pixels.show();
+  ring1.begin(); // This initializes the NeoPixel library.
+  ring1.setBrightness(80);
+  ring2.begin(); // This initializes the NeoPixel library.
+  ring2.setBrightness(80);
+  mouth.begin(); // This initializes the NeoPixel library.
+  mouth.setBrightness(80);
 
   //Printer
   mySerial.begin(printerBaudrate);  // must be 8N1 mode
@@ -100,14 +113,12 @@ void setup() {
   //delay(1000);
   Serial.println(client.connected());
 
-  client.subscribe("/lamp1/r");
-  client.subscribe("/lamp1/g");
-  client.subscribe("/lamp1/b");
+
   client.subscribe("/printer/test");
   client.onMessage(doStuff);
 
-  //printDate();
-  printDessin();
+  printDate();
+  //printDessin();
   //printTest();
   //printSudoku();
   //imprimerAvecCaracteresSpeciaux("ÇüéâäàçêëèïîÉôöûÿ");
@@ -116,7 +127,10 @@ void setup() {
   printer.feed(4);
   printer.setDefault(); // Restore printer to defaults
 
+
 }
+
+//---------------------------------------------------------------
 
 void loop() {
 
@@ -128,12 +142,17 @@ void loop() {
     // connect();
 
 
+
   }
 
-  for (int i = 0; i < NUMPIXELS; i++) { // For each pixel...
-    pixels.setPixelColor(i, pixels.Color(red, green, blue));
-  }
-  pixels.show();
+
+  /*  ring1.clear();
+    ring2.clear();
+    mouth.clear();
+    delay(1000);
+    sleepyHappy();
+    delay(1000);*/
+
 }
 
 void doStuff(String &topic, String &payload) {
@@ -148,11 +167,12 @@ void doStuff(String &topic, String &payload) {
     blue = payload.toFloat() * 255.0;
   } else if (topic.startsWith("/printer/test")) {
     //imprimerAvecCaracteresSpeciaux(payload);
+    
     printer.println("----------------------------");
     printer.feed(1);
     printer.println(payload);
     printer.feed(1);
-    
+
   }
 }
 
@@ -227,7 +247,7 @@ void printSudoku() {
 
 void printDessin() {
   printer.printBitmap(dessin_width, dessin_height, dessin_data);
-  }
+}
 
 void imprimerAvecCaracteresSpeciaux(String test) {
   int i = 0;

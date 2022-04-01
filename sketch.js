@@ -119,7 +119,7 @@ function printInput() {
 
 function printMessages() { 
   if (connected) {
-    let message = new Paho.MQTT.Message(input.value()); // start an MQTT message:
+    let message = new Paho.MQTT.Message(input.value); // start an MQTT message:
     message.destinationName = "/printer/test";
     client.send(message);
     console.log("sending test to printer")
